@@ -10,15 +10,19 @@ bot = telebot.TeleBot(TOKEN)
 
 user_languages = {}
 
+# វចនានុក្រមអត្ថបទ
 texts = {
     'kh': {
         'welcome': "សួស្តី {name}! សូមជ្រើសរើសសេវាកម្មខាងក្រោម៖",
         'select_below': "👇 សូមជ្រើសរើសជម្រើសនៅខាងក្រោម៖",
         'btn_manage': "👨🏻‍💻 គ្រប់គ្រងគណនី",
         'btn_rent': "🛍 ហាងសេវា", 
-        'btn_deposit': "💰 ដាក់ប្រាក់", # ប៊ូតុងថ្មី
-        'btn_change_lang': "🇬🇧 ភាសាអង់គ្លេស (English)", 
-        'manage_text': "នេះគឺជាទំព័រសម្រាប់ គ្រប់គ្រងគណនី របស់អ្នក។",
+        'btn_deposit': "💰 ដាក់ប្រាក់", 
+        'btn_change_lang': "🌐 ភាសា", # ប្តូរមកត្រឹមពាក្យ ភាសា
+        
+        # ព័ត៌មានគណនីដែលបានរចនាថ្មី
+        'account_info': "👨🏻‍💻ព័ត៌មានគណនី \n🌸➖➖➖➖🌸➖➖➖🌸\n  👨🏻‍💻 Name : {name}\n  🆔 ID : {id}\n🌸\n  💼 Balance : $0.00\n  🌟 Rank : Member\n🌸➖➖➖➖🌸➖➖➖🌸",
+        
         'rent_menu_text': "សូមជ្រើសរើសសេវាកម្មដែលអ្នកចង់បានខាងក្រោម៖",
         'btn_robux': "🎮 ទិញ Robux",
         'btn_back': "🔙 ត្រឡប់ក្រោយ",
@@ -35,7 +39,7 @@ texts = {
         # ផ្នែក Robux
         'robux_text': "តារាងតម្លៃសម្រាប់ទិញ Robux :",
         'robux_selected': "អ្នកបានជ្រើសរើសទិញកញ្ចប់ {package} ។\n\n👇 សូមបញ្ជូល Username Roblox របស់អ្នកខាងក្រោម៖\n\n🚫 វាយ /cancel ដើម្បីបោះបង់។",
-        'username_received': "✅ ទទួលបាន Username: {username} ជោគជ័យ!\n\nសូមធ្វើការបង់ប្រាក់ រួចផ្ញើវិក្កយបត្រ (Screenshot) មកកាន់ទីនេះ។",
+        'username_received': "✅ ទទួលបាន Username: {username} ជោគជ័យ!\n\n✅ ប្រសិនបើទឹកប្រាក់ក្នុងគណនីរបស់អ្នកគ្រប់គ្រាន់ បញ្ជាទិញជោគជ័យ! សូមរង់ចាំទទួលកូដ។",
         
         'main_menu_text': "អ្នកបានត្រឡប់មកម៉ឺនុយដើមវិញ៖",
         'lang_changed': "ភាសាត្រូវបានផ្លាស់ប្តូរទៅជា ខ្មែរ 🇰🇭"
@@ -46,8 +50,10 @@ texts = {
         'btn_manage': "👨🏻‍💻 Manage Account",
         'btn_rent': "🛍 Service Shop", 
         'btn_deposit': "💰 Deposit", 
-        'btn_change_lang': "🇰🇭 ភាសាខ្មែរ (Khmer)", 
-        'manage_text': "This is your Account Management page.",
+        'btn_change_lang': "🌐 ភាសា", 
+        
+        'account_info': "👨🏻‍💻Account Info \n🌸➖➖➖➖🌸➖➖➖🌸\n  👨🏻‍💻 Name : {name}\n  🆔 ID : {id}\n🌸\n  💼 Balance : $0.00\n  🌟 Rank : Member\n🌸➖➖➖➖🌸➖➖➖🌸",
+        
         'rent_menu_text': "Please select a service you want below:",
         'btn_robux': "🎮 Buy Robux",
         'btn_back': "🔙 Back",
@@ -64,7 +70,7 @@ texts = {
         # Robux Section
         'robux_text': "Pricing table for Robux :",
         'robux_selected': "You have selected the {package} package.\n\n👇 Please enter your Roblox Username below:\n\n🚫 Type /cancel to abort.",
-        'username_received': "✅ Received Username: {username} successfully!\n\nPlease make a payment and send the receipt (Screenshot) here.",
+        'username_received': "✅ Received Username: {username} successfully!\n\n✅ If your account balance is sufficient, the order is successful! Please wait to receive the code.",
         
         'main_menu_text': "You are back to the Main Menu:",
         'lang_changed': "Language changed to English 🇬🇧"
@@ -74,11 +80,13 @@ texts = {
 def get_user_lang(chat_id):
     return user_languages.get(chat_id, 'kh')
 
-# ម៉ឺនុយដើម (បន្ថែមប៊ូតុង ដាក់ប្រាក់)
+# ម៉ឺនុយដើម (បានរៀបចំជួរថ្មី)
 def get_main_keyboard(lang):
     markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    markup.add(KeyboardButton(texts[lang]['btn_manage']), KeyboardButton(texts[lang]['btn_deposit']))
-    markup.add(KeyboardButton(texts[lang]['btn_rent']), KeyboardButton(texts[lang]['btn_change_lang'])) 
+    # ដាក់ គ្រប់គ្រងគណនី និង ហាងសេវា ឱ្យនៅស្មើគ្នា (ជួរទី១)
+    markup.add(KeyboardButton(texts[lang]['btn_manage']), KeyboardButton(texts[lang]['btn_rent']))
+    # ដាក់ ដាក់ប្រាក់ និង ភាសា ឱ្យនៅស្មើគ្នា (ជួរទី២)
+    markup.add(KeyboardButton(texts[lang]['btn_deposit']), KeyboardButton(texts[lang]['btn_change_lang'])) 
     return markup
 
 def get_rent_keyboard(lang):
@@ -87,7 +95,7 @@ def get_rent_keyboard(lang):
     markup.add(KeyboardButton(texts[lang]['btn_back']))
     return markup
 
-# កូនប៊ូតុងសម្រាប់ដាក់ប្រាក់ (Inline)
+# កូនប៊ូតុងសម្រាប់ដាក់ប្រាក់
 def get_deposit_keyboard(lang):
     markup = InlineKeyboardMarkup(row_width=3)
     markup.add(
@@ -97,7 +105,6 @@ def get_deposit_keyboard(lang):
         InlineKeyboardButton("$4.00", callback_data='dep_4.00'),
         InlineKeyboardButton("$5.00", callback_data='dep_5.00')
     )
-    # ដាក់ប៊ូតុងបំពេញខ្លួនឯងនៅខាងក្រោមគេ ១ជួរពេញ
     markup.row(InlineKeyboardButton(texts[lang]['btn_custom_amount'], callback_data='dep_custom'))
     return markup
 
@@ -111,12 +118,11 @@ def get_robux_pricing_keyboard():
     )
     return markup
 
-# មុខងារសម្រាប់លុបសារ KHQR ក្រោយ ៣នាទី
 def delete_message_timer(chat_id, message_id):
     try:
         bot.delete_message(chat_id, message_id)
     except Exception as e:
-        pass # បើអ្នកប្រើប្រាស់លុបមុន វានឹងរំលង Error នេះ
+        pass 
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -138,7 +144,6 @@ def handle_deposit_selection(call):
         msg = bot.send_message(chat_id, texts[lang]['custom_amount_prompt'])
         bot.register_next_step_handler(msg, process_custom_amount)
     else:
-        # ទាញយកចំនួនលុយពី callback data (ឧ. dep_1.00 -> 1.00)
         amount = f"${call.data.split('_')[1]}"
         process_khqr_generation(chat_id, amount, lang)
 
@@ -154,26 +159,18 @@ def process_custom_amount(message):
     process_khqr_generation(chat_id, amount, lang)
 
 def process_khqr_generation(chat_id, amount, lang):
-    # ផ្ញើសារប្រាប់ថាកំពុងបង្កើត
     loading_msg = bot.send_message(chat_id, texts[lang]['generating_khqr'].format(amount=amount))
-    
-    # រង់ចាំ ៥ វិនាទី
     time.sleep(5)
     
-    # លុបសារ "កំពុងបង្កើត..." ចេញវិញ
     try:
         bot.delete_message(chat_id, loading_msg.message_id)
     except:
         pass
         
-    # ផ្ញើ KHQR ចូល
     khqr_url = "https://img.sanishtech.com/u/95f7764f8f7a67e3fd51da9a0ca17aac.jpeg"
     khqr_msg = bot.send_photo(chat_id, photo=khqr_url, caption=texts[lang]['khqr_ready'].format(amount=amount))
     
-    # បញ្ជាឱ្យលុប KHQR នេះក្នុងរយៈពេល ៣ នាទី (180 វិនាទី) ដោយប្រើ Thread ដើម្បីកុំឱ្យគាំង Bot
     threading.Timer(180.0, delete_message_timer, args=(chat_id, khqr_msg.message_id)).start()
-    
-    # ចាំទទួលវិក្កយបត្រ (ឬពាក្យ /cancel)
     bot.register_next_step_handler(khqr_msg, process_receipt)
 
 def process_receipt(message):
@@ -220,6 +217,8 @@ def process_robux_username(message):
 @bot.message_handler(func=lambda message: True)
 def handle_messages(message):
     chat_id = message.chat.id
+    user_name = message.from_user.first_name or "អតិថិជន"
+    user_id = message.from_user.id
     lang = get_user_lang(chat_id)
     text = message.text
 
@@ -231,8 +230,10 @@ def handle_messages(message):
     elif text in [texts['kh']['btn_deposit'], texts['en']['btn_deposit']]:
         bot.send_message(chat_id, texts[lang]['deposit_text'], reply_markup=get_deposit_keyboard(lang))
 
+    # បង្ហាញព័ត៌មានគណនីពេលចុចប៊ូតុង គ្រប់គ្រងគណនី
     elif text in [texts['kh']['btn_manage'], texts['en']['btn_manage']]:
-        bot.reply_to(message, texts[lang]['manage_text'])
+        formatted_info = texts[lang]['account_info'].format(name=user_name, id=user_id)
+        bot.reply_to(message, formatted_info)
 
     elif text in [texts['kh']['btn_rent'], texts['en']['btn_rent']]:
         bot.send_message(chat_id, texts[lang]['rent_menu_text'], reply_markup=get_rent_keyboard(lang))
