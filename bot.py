@@ -13,7 +13,7 @@ ADMIN_GROUP_ID = -1003968009107
 
 user_languages = {}
 
-# Database ក្លែងក្លាយសម្រាប់ផ្ទុកទិន្នន័យអ្នកប្រើប្រាស់ (ប្រើ Dictionary)
+# Database ក្លែងក្លាយសម្រាប់ផ្ទុកទិន្នន័យអ្នកប្រើប្រាស់
 users_db = {}
 
 def track_user(user):
@@ -22,7 +22,7 @@ def track_user(user):
         users_db[user.id] = {
             'first_name': user.first_name or "អតិថិជន",
             'username': user.username or "None",
-            'balance': 0.00 # លុយចាប់ផ្តើមដំបូង
+            'balance': 0.00 
         }
 
 # កំណត់តម្លៃ Robux សម្រាប់គណនា
@@ -48,13 +48,10 @@ texts = {
         'btn_rent': "🛍 ហាងសេវា", 
         'btn_deposit': "💰 ដាក់ប្រាក់", 
         'btn_change_lang': "🌐 ភាសា", 
-        
         'account_info': "👨🏻‍💻ព័ត៌មានគណនី \n🌸➖➖➖➖🌸➖➖➖🌸\n  👨🏻‍💻 Name : {name}\n  🆔 ID : <code>{id}</code>\n🌸\n  💼 Balance : <b>${balance:.2f}</b>\n  🌟 Rank : Member\n🌸➖➖➖➖🌸➖➖➖🌸",
-        
         'rent_menu_text': "សូមជ្រើសរើសសេវាកម្មដែលអ្នកចង់បានខាងក្រោម៖",
         'btn_robux': "🎮 ទិញ Robux",
         'btn_back': "🔙 ត្រឡប់ក្រោយ",
-        
         'deposit_text': "សូមជ្រើសរើសចំនួនទឹកប្រាក់ដែលអ្នកចង់ដាក់៖",
         'btn_custom_amount': "✍️ បំពេញចំនួនខ្លួនឯង",
         'custom_amount_prompt': "👇 សូមបញ្ជូលចំនួនទឹកប្រាក់ដែលអ្នកចង់ដាក់ (ឧទាហរណ៍: 1.50)៖\n\n🚫 វាយ /cancel ដើម្បីបោះបង់។",
@@ -62,12 +59,10 @@ texts = {
         'khqr_ready': "✅ នេះគឺជា KHQR របស់អ្នក សម្រាប់ចំនួន {amount}។\n\n⚠️ QR នេះនឹងលុបខ្លួនឯងដោយស្វ័យប្រវត្តិក្នុងរយៈពេល ៣ នាទី។\n\n👇 បន្ទាប់ពីទូទាត់រួច សូមផ្ញើវិក្កយបត្រ (Screenshot) មកកាន់ទីនេះ។\n\n🚫 វាយ /cancel ដើម្បីបោះបង់។",
         'receipt_received': "✅ ទទួលបានវិក្កយបត្រជោគជ័យ! សូមរង់ចាំ Admin ពិនិត្យនិងអនុម័តជូនអ្នក។",
         'cancelled': "🚫 ប្រតិបត្តិការត្រូវបានបោះបង់។ ត្រឡប់មកម៉ឺនុយដើម៖",
-        
         'robux_text': "តារាងតម្លៃសម្រាប់ទិញ Robux :",
         'robux_selected': "អ្នកបានជ្រើសរើសទិញកញ្ចប់ {package} ។\n\n👇 សូមបញ្ជូល Username Roblox របស់អ្នកខាងក្រោម៖\n\n🚫 វាយ /cancel ដើម្បីបោះបង់។",
         'username_received_insufficient': "✅ ទទួលបាន Username: {username} ជោគជ័យ!\n\nអ្នកមិនមានលុយគ្រប់គ្រាន់ដើម្បីទិញទេ សូមធ្វើការដាក់ប្រាក់ 🤍🙏🏻",
         'username_received_success': "✅ ទទួលបាន Username: {username} ជោគជ័យ!\n\n✅ ទឹកប្រាក់ត្រូវបានកាត់ចេញពីគណនី! បញ្ជាទិញជោគជ័យ សូមរង់ចាំទទួលកូដ។",
-        
         'main_menu_text': "អ្នកបានត្រឡប់មកម៉ឺនុយដើមវិញ៖",
         'lang_changed': "ភាសាត្រូវបានផ្លាស់ប្តូរទៅជា ខ្មែរ 🇰🇭"
     },
@@ -98,8 +93,7 @@ texts = {
     }
 }
 
-def get_user_lang(chat_id):
-    return user_languages.get(chat_id, 'kh')
+def get_user_lang(chat_id): return user_languages.get(chat_id, 'kh')
 
 def get_main_keyboard(lang):
     markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
@@ -153,10 +147,14 @@ def admin_panel(message):
         bot.reply_to(message, "❌ មុខងារនេះប្រើបានតែក្នុង Admin Group ប៉ុណ្ណោះ។")
         return
 
-    markup = InlineKeyboardMarkup(row_width=1)
+    markup = InlineKeyboardMarkup(row_width=2)
     markup.add(
-        InlineKeyboardButton("📣 សារទៅអ្នកប្រើប្រាស់ទាំងអស់", callback_data="adm_sys_broadcast"),
-        InlineKeyboardButton("👥 ឆែកមើលអ្នកប្រើប្រាស់ទាំងអស់", callback_data="adm_sys_users")
+        InlineKeyboardButton("📣 សារទៅទាំងអស់គ្នា", callback_data="adm_sys_broadcast"),
+        InlineKeyboardButton("👥 ឆែកអ្នកប្រើប្រាស់", callback_data="adm_sys_users")
+    )
+    markup.add(
+        InlineKeyboardButton("➕ បន្ថែមប្រាក់", callback_data="adm_sys_addbal"),
+        InlineKeyboardButton("➖ ដកប្រាក់", callback_data="adm_sys_subbal")
     )
     bot.reply_to(message, "🛠 <b>មឺនុយគ្រប់គ្រង (Admin Panel)</b>", parse_mode="HTML", reply_markup=markup)
 
@@ -180,6 +178,11 @@ def handle_admin_system(call):
     elif action == 'broadcast':
         msg = bot.send_message(call.message.chat.id, "✍️ <b>សូមវាយសារដែលអ្នកចង់ Broadcast:</b>\n\n<i>(វាយ /cancel ដើម្បីបោះបង់)</i>", parse_mode="HTML")
         bot.register_next_step_handler(msg, process_broadcast)
+        
+    elif action in ['addbal', 'subbal']:
+        action_kh = "បន្ថែម" if action == 'addbal' else "ដក"
+        msg = bot.send_message(call.message.chat.id, f"✍️ សូមបញ្ចូល <b>ID</b> របស់អ្នកប្រើប្រាស់ដែលអ្នកចង់ <b>{action_kh}</b> ប្រាក់៖\n\n<i>🚫 វាយ /cancel ដើម្បីបោះបង់។</i>", parse_mode="HTML")
+        bot.register_next_step_handler(msg, lambda m: ask_amount_for_balance(m, action))
 
 def process_broadcast(message):
     if message.text == '/cancel':
@@ -195,6 +198,42 @@ def process_broadcast(message):
         except: pass
             
     bot.send_message(message.chat.id, f"✅ ការ Broadcast ទទួលបានជោគជ័យ!\n👥 បានផ្ញើទៅកាន់: <b>{success} នាក់</b>", parse_mode="HTML")
+
+def ask_amount_for_balance(message, action):
+    if message.text == '/cancel':
+        bot.send_message(message.chat.id, "🚫 បោះបង់ប្រតិបត្តិការ។")
+        return
+        
+    try:
+        target_id = int(message.text)
+        if target_id not in users_db:
+            bot.send_message(message.chat.id, "❌ រកមិនឃើញ ID អ្នកប្រើប្រាស់នេះក្នុងប្រព័ន្ធទេ។ សូមពិនិត្យម្តងទៀត។")
+            return
+            
+        action_kh = "បន្ថែម" if action == 'addbal' else "ដក"
+        msg = bot.send_message(message.chat.id, f"✍️ សូមបញ្ចូលចំនួនទឹកប្រាក់ដែលចង់ <b>{action_kh}</b> សម្រាប់ ID: <code>{target_id}</code>\n*(ឧ. 5.50)*\n\n🚫 វាយ /cancel ដើម្បីបោះបង់។", parse_mode="HTML")
+        bot.register_next_step_handler(msg, lambda m: process_manual_balance(m, target_id, action))
+    except ValueError:
+        bot.send_message(message.chat.id, "❌ ID ត្រូវតែជាលេខសុទ្ធ។ សូមព្យាយាមម្តងទៀត។")
+
+def process_manual_balance(message, user_id, action):
+    if message.text == '/cancel':
+        bot.send_message(message.chat.id, "🚫 បោះបង់ប្រតិបត្តិការ។")
+        return
+        
+    try:
+        amount = float(message.text)
+        if action == 'addbal':
+            users_db[user_id]['balance'] += amount
+            bot.send_message(message.chat.id, f"✅ ជោគជ័យ! បាន **បន្ថែម** ប្រាក់ <b>${amount:.2f}</b> ចូលគណនី ID: <code>{user_id}</code>។\n💰 ទឹកប្រាក់ថ្មី: <b>${users_db[user_id]['balance']:.2f}</b>", parse_mode="HTML")
+            bot.send_message(user_id, f"🎉 គណនីរបស់អ្នកត្រូវបានបន្ថែមទឹកប្រាក់ចំនួន **${amount:.2f}** ដោយ Admin។", parse_mode="Markdown")
+        else:
+            users_db[user_id]['balance'] -= amount
+            bot.send_message(message.chat.id, f"✅ ជោគជ័យ! បាន **ដក** ប្រាក់ <b>${amount:.2f}</b> ពីគណនី ID: <code>{user_id}</code>។\n💰 ទឹកប្រាក់ថ្មី: <b>${users_db[user_id]['balance']:.2f}</b>", parse_mode="HTML")
+            bot.send_message(user_id, f"📉 គណនីរបស់អ្នកត្រូវបានកាត់ទឹកប្រាក់ចំនួន **${amount:.2f}** ដោយ Admin។", parse_mode="Markdown")
+            
+    except ValueError:
+        bot.send_message(message.chat.id, "❌ សូមបញ្ចូលជាលេខឱ្យបានត្រឹមត្រូវ (ឧទាហរណ៍: 1.50)។")
 
 
 # ================= ផ្នែក ដាក់ប្រាក់ (DEPOSIT) =================
@@ -248,7 +287,8 @@ def process_receipt(message, amount):
         InlineKeyboardButton("✅ Approve", callback_data=f"adm_app_dep_{chat_id}_{amount_val}"),
         InlineKeyboardButton("❌ Reject", callback_data=f"adm_rej_dep_{chat_id}")
     )
-    admin_markup.add(InlineKeyboardButton("💬 Reply ទៅកាន់ User", callback_data=f"adm_rep_{chat_id}"))
+    # បានកែសម្រួល callback_data អោយមាន ៤ ផ្នែក adm_rep_msg_{chat_id}
+    admin_markup.add(InlineKeyboardButton("💬 Reply ទៅកាន់ User", callback_data=f"adm_rep_msg_{chat_id}"))
     
     caption_text = f"💰 <b>សំណើដាក់ប្រាក់ថ្មី</b>\n\n👤 ឈ្មោះ: {message.from_user.first_name}\n🆔 ID: <code>{chat_id}</code>\n💵 ចំនួន: <b>{amount}</b>"
     
@@ -268,7 +308,6 @@ def handle_robux_payment_callback(call):
     
     selected_pkg_name = robux_names.get(call.data, "")
     msg = bot.send_message(chat_id, texts[lang]['robux_selected'].format(package=selected_pkg_name))
-    
     bot.register_next_step_handler(msg, lambda m: process_robux_username(m, call.data))
 
 def process_robux_username(message, package_key):
@@ -293,7 +332,8 @@ def process_robux_username(message, package_key):
         admin_markup = InlineKeyboardMarkup()
         admin_markup.add(
             InlineKeyboardButton("✅ បានផ្ញើកូដរួចរាល់", callback_data=f"adm_don_ord_{chat_id}"),
-            InlineKeyboardButton("💬 Reply ទាក់ទងទៅ User", callback_data=f"adm_rep_{chat_id}")
+            # បានកែសម្រួល callback_data អោយមាន ៤ ផ្នែក adm_rep_msg_{chat_id}
+            InlineKeyboardButton("💬 Reply ទាក់ទងទៅ User", callback_data=f"adm_rep_msg_{chat_id}")
         )
         order_text = f"🎮 <b>ការបញ្ជាទិញ Robux ថ្មី (បានកាត់លុយរួច)</b>\n\n👤 ឈ្មោះ: {message.from_user.first_name}\n🆔 ID: <code>{chat_id}</code>\n📦 កញ្ចប់: <b>{package_name}</b>\n🎮 Username: <code>{username}</code>\n\n✅ <i>ទឹកប្រាក់ ${price:.2f} ត្រូវបានកាត់ចេញពីគណនីអតិថិជនរួចរាល់។ សូម Admin ផ្ញើកូដអោយគាត់។</i>"
         bot.send_message(ADMIN_GROUP_ID, order_text, parse_mode="HTML", reply_markup=admin_markup)
@@ -302,14 +342,11 @@ def process_robux_username(message, package_key):
         bot.reply_to(message, texts[lang]['username_received_insufficient'].format(username=username))
 
 
-# ================= គ្រប់គ្រងសកម្មភាព ADMIN (APPROVE / REJECT) =================
-@bot.callback_query_handler(func=lambda call: call.data.startswith('adm_'))
+# ================= គ្រប់គ្រងសកម្មភាព ADMIN (APPROVE, REJECT, REPLY) =================
+@bot.callback_query_handler(func=lambda call: call.data.startswith('adm_') and 'sys' not in call.data)
 def handle_admin_actions(call):
     data_parts = call.data.split('_')
     action = data_parts[1] 
-    
-    if action == 'sys': return 
-    
     type_ = data_parts[2] 
     user_id = int(data_parts[3]) 
     bot.answer_callback_query(call.id)
@@ -317,28 +354,26 @@ def handle_admin_actions(call):
     if action == 'app' and type_ == 'dep':
         amount_val = float(data_parts[4])
         
-        # Add balance to user
         if user_id in users_db:
             users_db[user_id]['balance'] += amount_val 
         else:
-            # Just in case user is not in DB yet
             users_db[user_id] = {'first_name': "អតិថិជន", 'username': "None", 'balance': amount_val}
             
         bot.send_message(user_id, f"✅ សំណើដាក់ប្រាក់ចំនួន **${amount_val:.2f}** ត្រូវបានអនុម័តដោយ Admin ជោគជ័យ!\n\nទឹកប្រាក់ត្រូវបានបញ្ចូលទៅក្នុងគណនីរបស់អ្នក។", parse_mode="Markdown")
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
-        bot.send_message(call.message.chat.id, f"✅ អនុម័តទឹកប្រាក់ **${amount_val:.2f}** ចូលគណនី (ID: {user_id}) រួចរាល់។", parse_mode="Markdown")
+        bot.send_message(call.message.chat.id, f"✅ អនុម័តទឹកប្រាក់ **${amount_val:.2f}** ចូលគណនី (ID: <code>{user_id}</code>) រួចរាល់។", parse_mode="HTML")
         
     elif action == 'rej' and type_ == 'dep':
         bot.send_message(user_id, "❌ សំណើដាក់ប្រាក់របស់អ្នកត្រូវបាន **បដិសេធ** ដោយ Admin!", parse_mode="Markdown")
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
-        bot.send_message(call.message.chat.id, f"❌ បដិសេធវិក្កយបត្រ (ID: {user_id}) រួចរាល់។")
+        bot.send_message(call.message.chat.id, f"❌ បដិសេធវិក្កយបត្រ (ID: <code>{user_id}</code>) រួចរាល់។", parse_mode="HTML")
         
     elif action == 'don' and type_ == 'ord':
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
-        bot.send_message(call.message.chat.id, f"✅ ដោះស្រាយការបញ្ជាទិញរបស់ ID: {user_id} រួចរាល់។")
+        bot.send_message(call.message.chat.id, f"✅ ដោះស្រាយការបញ្ជាទិញរបស់ ID: <code>{user_id}</code> រួចរាល់។", parse_mode="HTML")
 
-    elif action == 'rep':
-        msg = bot.send_message(call.message.chat.id, f"✍️ សូមវាយសារដែលអ្នកចង់ផ្ញើទៅកាន់ User (ID: {user_id}):\n*(វាយពាក្យ /cancel ដើម្បីបោះបង់)*", parse_mode="Markdown")
+    elif action == 'rep' and type_ == 'msg':
+        msg = bot.send_message(call.message.chat.id, f"✍️ សូមវាយសារដែលអ្នកចង់ផ្ញើទៅកាន់ User (ID: <code>{user_id}</code>):\n*(វាយពាក្យ /cancel ដើម្បីបោះបង់)*", parse_mode="HTML")
         bot.register_next_step_handler(msg, lambda m: forward_to_user(m, user_id))
 
 def forward_to_user(message, user_id):
@@ -346,7 +381,7 @@ def forward_to_user(message, user_id):
         bot.send_message(message.chat.id, "🚫 បោះបង់ការផ្ញើសារ។")
         return
     bot.send_message(user_id, f"📩 <b>សារពី Admin:</b>\n\n{message.text}", parse_mode="HTML")
-    bot.send_message(message.chat.id, f"✅ សារបានផ្ញើទៅកាន់ User ({user_id}) ជោគជ័យ!")
+    bot.send_message(message.chat.id, f"✅ សារបានផ្ញើទៅកាន់ User (<code>{user_id}</code>) ជោគជ័យ!", parse_mode="HTML")
 
 
 # ================= MAIN MENU & TEXT HANDLER =================
