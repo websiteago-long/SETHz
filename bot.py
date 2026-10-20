@@ -242,11 +242,9 @@ def process_receipt(message, amount):
         
     bot.reply_to(message, texts[lang]['receipt_received'])
     
-    # បញ្ជូនទៅកាន់ Admin Group ដោយមានភ្ជាប់ទិន្នន័យចំនួនលុយនៅពីក្រោយប៊ូតុង Approve
     amount_val = amount.replace('$', '')
     admin_markup = InlineKeyboardMarkup()
     admin_markup.add(
-        # ទម្រង់ Callback: adm_app_dep_userid_amount
         InlineKeyboardButton("✅ Approve", callback_data=f"adm_app_dep_{chat_id}_{amount_val}"),
         InlineKeyboardButton("❌ Reject", callback_data=f"adm_rej_dep_{chat_id}")
     )
@@ -271,7 +269,6 @@ def handle_robux_payment_callback(call):
     selected_pkg_name = robux_names.get(call.data, "")
     msg = bot.send_message(chat_id, texts[lang]['robux_selected'].format(package=selected_pkg_name))
     
-    # បញ្ជូន Key របស់កញ្ចប់ទៅកាន់ Function បន្ទាប់ (ឧ. 'robux_279')
     bot.register_next_step_handler(msg, lambda m: process_robux_username(m, call.data))
 
 def process_robux_username(message, package_key):
@@ -288,14 +285,11 @@ def process_robux_username(message, package_key):
     price = robux_prices.get(package_key, 0)
     package_name = robux_names.get(package_key, "Unknown")
     
-    # ឆែកមើលលុយក្នុងគណនី
     if users_db[user_id]['balance'] >= price:
-        # បើមានលុយគ្រប់គ្រាន់ កាត់លុយចេញ
         users_db[user_id]['balance'] -= price
         
         bot.reply_to(message, texts[lang]['username_received_success'].format(username=username))
         
-        # ផ្ញើការបញ្ជាទិញទៅ Admin 
         admin_markup = InlineKeyboardMarkup()
         admin_markup.add(
             InlineKeyboardButton("✅ បានផ្ញើកូដរួចរាល់", callback_data=f"adm_don_ord_{chat_id}"),
@@ -305,7 +299,6 @@ def process_robux_username(message, package_key):
         bot.send_message(ADMIN_GROUP_ID, order_text, parse_mode="HTML", reply_markup=admin_markup)
         
     else:
-        # បើលុយមិនគ្រប់
         bot.reply_to(message, texts[lang]['username_received_insufficient'].format(username=username))
 
 
@@ -313,37 +306,37 @@ def process_robux_username(message, package_key):
 @bot.callback_query_handler(func=lambda call: call.data.startswith('adm_'))
 def handle_admin_actions(call):
     data_parts = call.data.split('_')
-    action = data_parts[1] # app (approve), rej (reject), rep (reply), don (done), sys (system)
+    action = data_parts[1] 
     
-    if action == 'sys': return # System buttons already handled above
+    if action == 'sys': return 
     
-    type_ = data_parts[2] # dep (deposit), ord (order)
+    type_ = data_parts[2] 
     user_id = int(data_parts[3]) 
     bot.answer_callback_query(call.id)
     
-    # ១. អនុម័តទឹកប្រាក់ (Approve Deposit)
     if action == 'app' and type_ == 'dep':
         amount_val = float(data_parts[4])
         
+        # Add balance to user
         if user_id in users_db:
-            users_db[user_id]['balance'] += amount_val # បូកលុយចូល
+            users_db[user_id]['balance'] += amount_val 
+        else:
+            # Just in case user is not in DB yet
+            users_db[user_id] = {'first_name': "អតិថិជន", 'username': "None", 'balance': amount_val}
             
         bot.send_message(user_id, f"✅ សំណើដាក់ប្រាក់ចំនួន **${amount_val:.2f}** ត្រូវបានអនុម័តដោយ Admin ជោគជ័យ!\n\nទឹកប្រាក់ត្រូវបានបញ្ចូលទៅក្នុងគណនីរបស់អ្នក។", parse_mode="Markdown")
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
         bot.send_message(call.message.chat.id, f"✅ អនុម័តទឹកប្រាក់ **${amount_val:.2f}** ចូលគណនី (ID: {user_id}) រួចរាល់។", parse_mode="Markdown")
         
-    # ២. បដិសេធទឹកប្រាក់ (Reject Deposit)
     elif action == 'rej' and type_ == 'dep':
         bot.send_message(user_id, "❌ សំណើដាក់ប្រាក់របស់អ្នកត្រូវបាន **បដិសេធ** ដោយ Admin!", parse_mode="Markdown")
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
         bot.send_message(call.message.chat.id, f"❌ បដិសេធវិក្កយបត្រ (ID: {user_id}) រួចរាល់។")
         
-    # ៣. គ្រាន់តែលុបប៊ូតុងពេល Admin ធ្វើការរួចរាល់ (Done Order)
     elif action == 'don' and type_ == 'ord':
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
         bot.send_message(call.message.chat.id, f"✅ ដោះស្រាយការបញ្ជាទិញរបស់ ID: {user_id} រួចរាល់។")
 
-    # ៤. ឆ្លើយតបទៅកាន់ User ផ្ទាល់ (Reply)
     elif action == 'rep':
         msg = bot.send_message(call.message.chat.id, f"✍️ សូមវាយសារដែលអ្នកចង់ផ្ញើទៅកាន់ User (ID: {user_id}):\n*(វាយពាក្យ /cancel ដើម្បីបោះបង់)*", parse_mode="Markdown")
         bot.register_next_step_handler(msg, lambda m: forward_to_user(m, user_id))
