@@ -4,13 +4,10 @@ import os
 import time
 import threading
 
-# យក Token ពី Environment Variables
 TOKEN = os.environ.get('BOT_TOKEN', 'ដាក់_TOKEN_របស់អ្នកនៅទីនេះ')
 bot = telebot.TeleBot(TOKEN)
-
-# ID របស់ Admin Group និង ID ផ្ទាល់ខ្លួនរបស់ Admin
 ADMIN_GROUP_ID = -1003968009107 
-ADMIN_USER_ID = 8904196183 # ID របស់អ្នក ដើម្បីអាចប្រើ /admin ក្នុង Private Chat បាន
+ADMIN_USER_ID = 8904196183 
 
 user_languages = {}
 users_db = {}
@@ -109,9 +106,9 @@ def send_welcome(message):
 # ================= ផ្នែក ADMIN PANEL (/admin) =================
 @bot.message_handler(commands=['admin'])
 def admin_panel(message):
-    # អនុញ្ញាតឱ្យ Admin ប្រើមុខងារនេះបាន ទាំងក្នុង Group និង Private Chat របស់គាត់
     if message.chat.id != ADMIN_GROUP_ID and message.from_user.id != ADMIN_USER_ID:
-        bot.reply_to(message, "❌ អ្នកមិនមានសិទ្ធិប្រើប្រាស់មុខងារនេះទេ។")
+        # ប្តូរសារនៅទីនេះតាមការស្នើសុំ
+        bot.reply_to(message, "❌ អ្នកមិនមែនជាអ្នកគ្រប់គ្រងទេ")
         return
 
     markup = InlineKeyboardMarkup(row_width=2)
@@ -172,9 +169,12 @@ def process_manual_balance(message, user_id, action):
         if action == 'addbal':
             users_db[user_id]['balance'] += amount
             bot.send_message(message.chat.id, f"✅ ជោគជ័យ! បន្ថែមប្រាក់ <b>${amount:.2f}</b> ចូលគណនី <code>{user_id}</code>។", parse_mode="HTML")
+            bot.send_message(user_id, f"🎉 គណនីរបស់អ្នកត្រូវបានបន្ថែមទឹកប្រាក់ចំនួន **${amount:.2f}** ដោយ Admin។", parse_mode="Markdown")
         else:
             users_db[user_id]['balance'] -= amount
             bot.send_message(message.chat.id, f"✅ ជោគជ័យ! ដកប្រាក់ <b>${amount:.2f}</b> ពីគណនី <code>{user_id}</code>។", parse_mode="HTML")
+            bot.send_message(user_id, f"📉 គណនីរបស់អ្នកត្រូវបានកាត់ទឹកប្រាក់ចំនួន **${amount:.2f}** ដោយ Admin។", parse_mode="Markdown")
+            
     except ValueError: bot.send_message(message.chat.id, "❌ សូមបញ្ចូលជាលេខឱ្យបានត្រឹមត្រូវ។")
 
 # ================= គ្រប់គ្រងការកែតម្លៃ ROBUX =================
@@ -268,7 +268,7 @@ def process_robux_username(message, package_key):
         bot.reply_to(message, texts[lang]['username_received_success'].format(username=message.text))
         
         admin_markup = InlineKeyboardMarkup()
-        admin_markup.add(InlineKeyboardButton("✅ បានផ្ញើកូដរួចរាល់", callback_data=f"adm_don_ord_{message.chat.id}"), InlineKeyboardButton("💬 Reply ទៅកាន់ User", callback_data=f"adm_rep_msg_{message.chat.id}"))
+        admin_markup.add(InlineKeyboardButton("✅ បានផ្ញើកូដរួចរាល់", callback_data=f"adm_don_ord_{message.chat.id}"), InlineKeyboardButton("💬 Reply ទាក់ទងទៅ User", callback_data=f"adm_rep_msg_{message.chat.id}"))
         order_text = f"🎮 <b>ការបញ្ជាទិញ Roblox Code ថ្មី</b>\n\n👤 ឈ្មោះ: {message.from_user.first_name}\n🆔 ID: <code>{message.chat.id}</code>\n📦 កញ្ចប់: <b>{package_name}</b>\n🎮 Username: <code>{message.text}</code>\n\n✅ <i>ទឹកប្រាក់ ${price:.2f} ត្រូវបានកាត់រួចរាល់។</i>"
         bot.send_message(ADMIN_GROUP_ID, order_text, parse_mode="HTML", reply_markup=admin_markup)
     else: bot.reply_to(message, texts[lang]['username_received_insufficient'].format(username=message.text))
