@@ -4,14 +4,17 @@ import os
 import time
 import threading
 
+# យក Token ពី Environment Variables
 TOKEN = os.environ.get('BOT_TOKEN', 'ដាក់_TOKEN_របស់អ្នកនៅទីនេះ')
 bot = telebot.TeleBot(TOKEN)
+
+# ID របស់ Admin Group និង ID ផ្ទាល់ខ្លួនរបស់ Admin
 ADMIN_GROUP_ID = -1003968009107 
+ADMIN_USER_ID = 8904196183 # ID របស់អ្នក ដើម្បីអាចប្រើ /admin ក្នុង Private Chat បាន
 
 user_languages = {}
 users_db = {}
 
-# Database សម្រាប់ផ្ទុកតម្លៃ និងឈ្មោះ Robux (អាចកែប្រែបាន)
 robux_db = {
     'robux_1': {'name': '279 Robux', 'price': 3.10},
     'robux_2': {'name': '362 Robux', 'price': 4.10},
@@ -19,7 +22,6 @@ robux_db = {
     'robux_4': {'name': '1000 Robux', 'price': 9.99}
 }
 
-# ប្រើអថេរនេះសម្រាប់ចាំថា Admin កំពុងកែប្រែកញ្ចប់មួយណា
 admin_editing_robux = {}
 
 def track_user(user):
@@ -89,7 +91,6 @@ def get_deposit_keyboard(lang):
     markup.row(InlineKeyboardButton(texts[lang]['btn_custom_amount'], callback_data='dep_custom'))
     return markup
 
-# ទាញយកតម្លៃ Robux ពី Database ផ្ទាល់
 def get_robux_pricing_keyboard():
     markup = InlineKeyboardMarkup(row_width=1)
     for key, data in robux_db.items():
@@ -108,14 +109,15 @@ def send_welcome(message):
 # ================= ផ្នែក ADMIN PANEL (/admin) =================
 @bot.message_handler(commands=['admin'])
 def admin_panel(message):
-    if message.chat.id != ADMIN_GROUP_ID and message.chat.id > 0:
-        bot.reply_to(message, "❌ មុខងារនេះប្រើបានតែក្នុង Admin Group ប៉ុណ្ណោះ។")
+    # អនុញ្ញាតឱ្យ Admin ប្រើមុខងារនេះបាន ទាំងក្នុង Group និង Private Chat របស់គាត់
+    if message.chat.id != ADMIN_GROUP_ID and message.from_user.id != ADMIN_USER_ID:
+        bot.reply_to(message, "❌ អ្នកមិនមានសិទ្ធិប្រើប្រាស់មុខងារនេះទេ។")
         return
 
     markup = InlineKeyboardMarkup(row_width=2)
     markup.add(InlineKeyboardButton("📣 សារទៅទាំងអស់គ្នា", callback_data="adm_sys_broadcast"), InlineKeyboardButton("👥 ឆែកអ្នកប្រើប្រាស់", callback_data="adm_sys_users"))
     markup.add(InlineKeyboardButton("➕ បន្ថែមប្រាក់", callback_data="adm_sys_addbal"), InlineKeyboardButton("➖ ដកប្រាក់", callback_data="adm_sys_subbal"))
-    markup.add(InlineKeyboardButton("✏️ កែប្រែតម្លៃ Robux", callback_data="adm_sys_editrobux")) # ប៊ូតុងថ្មីសម្រាប់កែតម្លៃ
+    markup.add(InlineKeyboardButton("✏️ កែប្រែតម្លៃ Robux", callback_data="adm_sys_editrobux")) 
     bot.reply_to(message, "🛠 <b>មឺនុយគ្រប់គ្រង (Admin Panel)</b>", parse_mode="HTML", reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('adm_sys_'))
@@ -138,7 +140,6 @@ def handle_admin_system(call):
         msg = bot.send_message(call.message.chat.id, f"✍️ សូមបញ្ចូល <b>ID</b> របស់អ្នកប្រើប្រាស់ដែលអ្នកចង់ <b>{action_kh}</b> ប្រាក់៖\n\n<i>🚫 វាយ /cancel ដើម្បីបោះបង់។</i>", parse_mode="HTML")
         bot.register_next_step_handler(msg, lambda m: ask_amount_for_balance(m, action))
         
-    # ដំណើរការពេល Admin ចុច "កែប្រែតម្លៃ Robux"
     elif action == 'editrobux':
         markup = InlineKeyboardMarkup(row_width=1)
         for key, data in robux_db.items():
@@ -180,7 +181,7 @@ def process_manual_balance(message, user_id, action):
 @bot.callback_query_handler(func=lambda call: call.data.startswith('adm_edit_rbx_'))
 def handle_edit_robux_selection(call):
     bot.answer_callback_query(call.id)
-    pkg_key = call.data.replace('adm_edit_rbx_', '') # ឧ. 'robux_1'
+    pkg_key = call.data.replace('adm_edit_rbx_', '') 
     admin_editing_robux[call.message.chat.id] = pkg_key
     
     current_data = robux_db[pkg_key]
@@ -191,7 +192,7 @@ def process_new_robux_name(message):
     if message.text == '/cancel': return bot.send_message(message.chat.id, "🚫 បោះបង់ការកែប្រែ។")
     new_name = message.text
     pkg_key = admin_editing_robux.get(message.chat.id)
-    robux_db[pkg_key]['name'] = new_name # Update Name
+    robux_db[pkg_key]['name'] = new_name 
     
     msg = bot.send_message(message.chat.id, f"✅ ឈ្មោះថ្មី: <b>{new_name}</b>\n\n✍️ បន្តទៀត សូមបញ្ចូល <b>តម្លៃថ្មី (ជាលេខ)</b>៖\n*(ឧទាហរណ៍: 5.50)*", parse_mode="HTML")
     bot.register_next_step_handler(msg, process_new_robux_price)
@@ -201,7 +202,7 @@ def process_new_robux_price(message):
     try:
         new_price = float(message.text)
         pkg_key = admin_editing_robux.get(message.chat.id)
-        robux_db[pkg_key]['price'] = new_price # Update Price
+        robux_db[pkg_key]['price'] = new_price 
         bot.send_message(message.chat.id, f"🎉 <b>កែប្រែជោគជ័យ!</b>\nកញ្ចប់ថ្មីគឺ: <b>{robux_db[pkg_key]['name']}</b> ក្នុងតម្លៃ <b>${new_price:.2f}</b>", parse_mode="HTML")
     except ValueError:
         bot.send_message(message.chat.id, "❌ តម្លៃត្រូវតែជាលេខសុទ្ធ (ឧ. 5.50)។ ការកែប្រែបរាជ័យ។")
